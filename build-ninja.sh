@@ -5,7 +5,7 @@
 
 PROJ=ninja
 VER=master
-BASE_VER=v1.6.0
+BASE_VER=v1.7.2
 MSVS=2013
 
 source $(dirname "$0")/build-common.sh build-common.sh
