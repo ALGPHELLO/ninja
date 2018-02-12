@@ -53,6 +53,11 @@ int MSVCHelperMain(int argc, char** argv);
 void CreateWin32MiniDump(_EXCEPTION_POINTERS* pep);
 #endif
 
+// Ninja intentionally leaks memory. Turn off LeakSanitizer by default.
+extern "C" const char* __asan_default_options() {
+  return "detect_leaks=0";
+}
+
 namespace {
 
 struct Tool;
@@ -929,14 +934,14 @@ bool NinjaMain::OpenDepsLog(bool recompact_only) {
   }
 
   if (recompact_only) {
-    bool success = deps_log_.Recompact(path, &err);
+    bool success = deps_log_.Recompact(path, disk_interface_, &err);
     if (!success)
       Error("failed recompaction: %s", err.c_str());
     return success;
   }
 
   if (!config_.dry_run) {
-    if (!deps_log_.OpenForWrite(path, &err)) {
+    if (!deps_log_.OpenForWrite(path, disk_interface_, &err)) {
       Error("opening deps log: %s", err.c_str());
       return false;
     }
